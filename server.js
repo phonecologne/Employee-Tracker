@@ -88,7 +88,7 @@ function viewEmployee() {
   LEFT JOIN department d
   ON d.id = r.department_id
   LEFT JOIN employee m
-  ON m.id  = e.manager_id`
+  ON m.id  = e.manager_id`;
 
   connection.query(query, function (er, res) {
     if (err) throw err;
@@ -98,6 +98,31 @@ function viewEmployee() {
 
     firstPrompt();
   });
-
 }
+
+//now we want to be able to view employees by each department
+function viewEmployeeByDeparmtent() {
+  console.log("Viewing Employees by Department\n");
+
+  var query = `Select d.id, dname, r.salary AS budget
+  FROM employee e
+  LEFT JOIN role r
+  ON e.role_id = r.id
+  LEFT JOIN depertment d
+  ON d.id = r.department_id
+  GROUP BY d.id, d.name`;
+}
+
+connection.query(query, function (err, res) {
+  if (err) throw err;
+
+  const departmentChoices = res.map(data => ({
+    value: data.id, name: data.name
+  }));
+
+  console.table(res);
+  console.log("Department view succeed!\n");
+
+  promptDepartment(departmentChoices);
+});
 
