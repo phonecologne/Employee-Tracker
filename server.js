@@ -172,7 +172,7 @@ function addEmployee() {
    connection.query(query, function (err, res) {
      if (err) throw err;
 
-     const roleChoices = res.map(({ id. title, salary }) => ({
+     const roleChoices = res.map(({ id, title, salary }) => ({
        value: id, title: `${title}`, salary: `${salary}`
      }));
 
@@ -195,7 +195,31 @@ function propmtInsert(roleChoices) {
       message: "Please input the employee's last name"
     },
     {
-      
-    }
-  ]
+      type: "list",
+      name: "roleId",
+      message: "What is the role of the current employee?",
+      choices: roleChoices
+    },
+  ])
+  .then(function (answer) {
+    console.log(answer);
+
+    var query = `INSERT INTO employee SET ?`
+    //once the prompts have stopped for the employee info we can use that info into the following
+    connection.query(query,
+      {
+        first_name: answer.first_name,
+        last_name: answer.last_name,
+        role_id: answer.managerId,
+      },
+      function (err, res) {
+        if (err) throw err;
+
+        console.table(res);
+        console.log(res.insertedRows + "Information has been added and/or updated!\n");
+
+        firstPrompt();
+      });
+  });
 }
+
