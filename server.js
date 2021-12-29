@@ -161,3 +161,41 @@ function promptDepartment(deparmtentChoices) {
   });
 }
 
+//now we want to make an array for the employee list
+function addEmployee() {
+  console.log("Adding Employees")
+
+  var query =
+  `SELECT r.id, r.title, r.salary
+   FROM role r`
+
+   connection.query(query, function (err, res) {
+     if (err) throw err;
+
+     const roleChoices = res.map(({ id. title, salary }) => ({
+       value: id, title: `${title}`, salary: `${salary}`
+     }));
+
+     console.table(res);
+     console.log("roleChoices");
+   });
+}
+
+function propmtInsert(roleChoices) {
+  inquirer
+  .prompt([
+    {
+      type: "input",
+      name: "first_name",
+      message: "Please input the employee's first name"
+    },
+    {
+      type: "input",
+      name: "last_name",
+      message: "Please input the employee's last name"
+    },
+    {
+      
+    }
+  ]
+}
