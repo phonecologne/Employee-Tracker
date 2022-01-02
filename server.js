@@ -307,3 +307,61 @@ function employeeArray() {
     roleArray(employeeChoices);
   });
 }
+
+function roleArray(employeeChoices) {
+  console.log("Now You Can Update a Role!");
+
+  var query =
+    `SELECT r.id, r.title, r.salary 
+     FROM role r`
+  let roleChoices;
+
+  connection.query(query, function (err, res) {
+    if (err) throw err;
+
+    roleChoices = res.map(({ id, title, salary }) => ({
+      value: id, TITLE: `${title}`, SALARY: `${salary}`      
+    }));
+
+    console.table(res);
+    console.log("roleArray is now Updated!\n")
+
+    promptEmployeeRole(employeeChoices, roleChoices);
+  });
+}
+
+function promptEmployeeRole(employeeChoices, roleChoices) {
+
+  inquirer
+    .prompt([
+      {
+        type: "list",
+        name: "employeeId",
+        message: "Now Which Employee Would You Like to Update Their Role??",
+        choices: employeeChoices
+      },
+      {
+        type: "list",
+        name: "roleId",
+        message: "Which Role Would You Like to Update?",
+        choices: roleChoices
+      },
+    ])
+    .then(function (answer) {
+
+      var query = `UPDATE employee SET role_id = ? WHERE id = ?`
+      // when finished prompting, insert a new item into the db with that info
+      connection.query(query,
+        [ answer.roleId,  
+          answer.employeeId
+        ],
+        function (err, res) {
+          if (err) throw err;
+
+          console.table(res);
+          console.log(res.affectedRows + "Success! The System has accepted your changes!");
+
+          firstPrompt();
+        });
+    });
+}
