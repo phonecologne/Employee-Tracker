@@ -365,3 +365,67 @@ function promptEmployeeRole(employeeChoices, roleChoices) {
         });
     });
 }
+
+//this is now the function to add a new role to the tracker
+function addRole() {
+  var query =
+  `SELECT d.id, d.name, r.salary AS budget
+  FROM employee e
+  JOIN role r
+  ON e.role_id = r.id
+  JOIN department d
+  ON d.id = r.department_id
+  GROUP BY d.id, d.name`
+
+  connection.query(query, function (err,res) {
+    if (err) throw err;
+
+    const departmentChoices = res.map(({ id,name }) => ({
+      value: id, name: `${id} ${name}`
+    }));
+
+    console.table(res);
+    console.log("Department Role Created!");
+
+    promptAddRole(departmentChoices);
+  });
+}
+
+function promptAddRole(deparmtentChoices) {
+
+  inquirer
+  .prompt([
+    {
+    type: "input",
+    name: "roleTitle",
+    message: "Which Role Do You Need To Add?"
+    },
+    {
+      type: "input",
+      name: "roleSalary",
+      message: "Please Input the Salary for this Role"
+    },
+    {
+      type: "list",
+      name: "departmentId",
+      message: "Which Department Should This Role Go Into? Please be Specific!",
+      choices: deparmtentChoices
+    },
+  ])
+  .then(function (answer) {
+    var query = `INSERT INTO role SET ?`
+
+    connection.query(query, {
+      title: answer.title,
+      salary: answer.salary,
+      department_id: answer.departmentId
+    },
+    function (err, res) {
+      if (err) throw err;
+      console.table(res);
+      console.log("The Role Has Been Updated and Saved!");
+
+      firstPrompt();
+    });
+  });
+}
