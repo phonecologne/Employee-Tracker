@@ -37,6 +37,7 @@ function firstPrompt() {
       choices: [
         "View Employees",
         "View Employees by Department",
+        "View All Departments",
         "Add a New Employee",
         "Remove a Employee from the System",
         "Update an Employee's Role",
@@ -55,7 +56,7 @@ function firstPrompt() {
           break;
 
         case "To Add Employee":
-          adEmployee();
+          addEmployee();
           break;
 
         case "To Remove an Employees":
@@ -68,6 +69,10 @@ function firstPrompt() {
 
         case "Adding a New Role":
           addRole();
+          break;
+
+        case "View All Departments":
+          viewDepartments();
           break;
 
         case "End":
@@ -128,26 +133,8 @@ connection.query(query, function (err, res) {
 });
 
 //now lets pick the department so we can see the employees
-function promptDepartment(deparmtentChoices) {
-  inquirer
-    .prompt([
-      {
-        type: "list",
-        name: "deparmentId",
-        message: "Which Department Employees Would You Like to View?",
-        choices: deparmtentChoices,
-      },
-    ])
-    .then(function (answer) {
-      console.log("answer ", answer.departmentId);
-
-      var query = `SELECT e.id, e.first_name, e.last_name, r.title, d/name AS department
-    FROM employee e
-    JOIN role r
-    ON e.role_id = r.id
-    JOIN department d
-    ON d.id = r.department_id
-    WHERE d.id = ?`;
+function viewDepartments(departmentChoices) {
+  var query = `SELECT * FROM department`;
 
       connection.query(query, answer.departmentId, function (err, res) {
         if (err) throw err;
@@ -157,7 +144,6 @@ function promptDepartment(deparmtentChoices) {
 
         firstPrompt();
       });
-    });
 }
 
 //now we want to make an array for the employee list
@@ -196,6 +182,12 @@ function propmtInsert(roleChoices) {
       },
       {
         type: "list",
+        name: "managerId",
+        message: "Which Manager Does This Employee Report To?",
+        choices: ['1', '2', '3']
+      },
+      {
+        type: "list",
         name: "roleId",
         message: "What is the role of the current employee?",
         choices: roleChoices,
@@ -211,7 +203,8 @@ function propmtInsert(roleChoices) {
         {
           first_name: answer.first_name,
           last_name: answer.last_name,
-          role_id: answer.managerId,
+          manager_id: answer.managerId,
+          role_id: answer.roleId, 
         },
         function (err, res) {
           if (err) throw err;
@@ -276,7 +269,7 @@ function promptDelete(deleteEmployeeChoices) {
 }
 
 //updating the employee's role with a function 
-function updateEmployeeRole() { 
+function updateEmployeeRole() {
   employeeArray();
 
 }
@@ -298,7 +291,7 @@ function employeeArray() {
     if (err) throw err;
 
     const employeeChoices = res.map(({ id, first_name, last_name }) => ({
-      value: id, name: `${first_name} ${last_name}`      
+      value: id, name: `${first_name} ${last_name}`
     }));
 
     console.table(res);
@@ -320,7 +313,7 @@ function roleArray(employeeChoices) {
     if (err) throw err;
 
     roleChoices = res.map(({ id, title, salary }) => ({
-      value: id, TITLE: `${title}`, SALARY: `${salary}`      
+      value: id, TITLE: `${title}`, SALARY: `${salary}`
     }));
 
     console.table(res);
@@ -352,8 +345,8 @@ function promptEmployeeRole(employeeChoices, roleChoices) {
       var query = `UPDATE employee SET role_id = ? WHERE id = ?`
       // when finished prompting, insert a new item into the db with that info
       connection.query(query,
-        [ answer.roleId,  
-          answer.employeeId
+        [answer.roleId,
+        answer.employeeId
         ],
         function (err, res) {
           if (err) throw err;
@@ -369,7 +362,7 @@ function promptEmployeeRole(employeeChoices, roleChoices) {
 //this is now the function to add a new role to the tracker
 function addRole() {
   var query =
-  `SELECT d.id, d.name, r.salary AS budget
+    `SELECT d.id, d.name, r.salary AS budget
   FROM employee e
   JOIN role r
   ON e.role_id = r.id
@@ -377,10 +370,10 @@ function addRole() {
   ON d.id = r.department_id
   GROUP BY d.id, d.name`
 
-  connection.query(query, function (err,res) {
+  connection.query(query, function (err, res) {
     if (err) throw err;
 
-    const departmentChoices = res.map(({ id,name }) => ({
+    const departmentChoices = res.map(({ id, name }) => ({
       value: id, name: `${id} ${name}`
     }));
 
@@ -394,38 +387,38 @@ function addRole() {
 function promptAddRole(deparmtentChoices) {
 
   inquirer
-  .prompt([
-    {
-    type: "input",
-    name: "roleTitle",
-    message: "Which Role Do You Need To Add?"
-    },
-    {
-      type: "input",
-      name: "roleSalary",
-      message: "Please Input the Salary for this Role"
-    },
-    {
-      type: "list",
-      name: "departmentId",
-      message: "Which Department Should This Role Go Into? Please be Specific!",
-      choices: deparmtentChoices
-    },
-  ])
-  .then(function (answer) {
-    var query = `INSERT INTO role SET ?`
+    .prompt([
+      {
+        type: "input",
+        name: "roleTitle",
+        message: "Which Role Do You Need To Add?"
+      },
+      {
+        type: "input",
+        name: "roleSalary",
+        message: "Please Input the Salary for this Role"
+      },
+      {
+        type: "list",
+        name: "departmentId",
+        message: "Which Department Should This Role Go Into? Please be Specific!",
+        choices: deparmtentChoices
+      },
+    ])
+    .then(function (answer) {
+      var query = `INSERT INTO role SET ?`
 
-    connection.query(query, {
-      title: answer.title,
-      salary: answer.salary,
-      department_id: answer.departmentId
-    },
-    function (err, res) {
-      if (err) throw err;
-      console.table(res);
-      console.log("The Role Has Been Updated and Saved!");
+      connection.query(query, {
+        title: answer.title,
+        salary: answer.salary,
+        department_id: answer.departmentId
+      },
+        function (err, res) {
+          if (err) throw err;
+          console.table(res);
+          console.log("The Role Has Been Updated and Saved!");
 
-      firstPrompt();
+          firstPrompt();
+        });
     });
-  });
 }
