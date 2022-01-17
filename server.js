@@ -220,7 +220,7 @@ function propmtInsert(roleChoices) {
     });
 }
 
-//now we want to be able to delete employees from the network
+//now I want to be able to delete employees from the network so the user can keep their system up to date
 function removeEmployees() {
   console.log("Now We Can Delete an Employee");
 
@@ -268,7 +268,7 @@ function promptDelete(deleteEmployeeChoices) {
     });
 }
 
-//updating the employee's role with a function 
+//updating the employee's role with this function; this seems like such a small line of code to make but it's calling back to the updateEmployeeRole I've written previously
 function updateEmployeeRole() {
   employeeArray();
 
@@ -385,7 +385,7 @@ function addRole() {
 }
 
 function promptAddRole(deparmtentChoices) {
-
+//the type list for departmentChoices was messing me up since I thought the user would want to input their choice, but I needed to have the drop down list of already created departments within the org; letting the user input would be creating too much data
   inquirer
     .prompt([
       {

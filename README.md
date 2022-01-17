@@ -1,7 +1,5 @@
 # (Module 12) SQL Challenge: Employee Tracker
 
-## Demo 
-
 ## User Story
 AS A business owner<br>
 I WANT to be able to view and manage the departments, roles, and employees in my company<br>
