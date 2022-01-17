@@ -1,13 +1,27 @@
 USE employeesDB;
 
 INSERT INTO department (name)
-VALUES ("Sales");
+VALUES ("Administrative");
 INSERT INTO department (name)
-VALUES ("Engineering");
+VALUES ("Analytics");
 INSERT INTO deparment (name)
-VALUES ("Finance");
+VALUES ("Communications");
+INSERT INTO deparment (name)
+VALUES ("Compliance");
+INSERT INTO deparment (name)
+VALUES ("Data");
+INSERT INTO deparment (name)
+VALUES ("Executive");
+INSERT INTO deparment (name)
+VALUES ("Financial");
+INSERT INTO deparment (name)
+VALUES ("Human Resources");
 INSERT INTO deparment (name)
 VALUES ("Legal");
+INSERT INTO deparment (name)
+VALUES ("Marketing");
+INSERT INTO deparment (name)
+VALUES ("Research");
 
 INSERT INTO role (title, salary, department_id)
 VALUES ("Sales Lead", 100000, 1);
